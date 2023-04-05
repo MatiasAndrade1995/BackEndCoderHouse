@@ -1,4 +1,4 @@
-//Entrega 1 - Andrade Matias
+//Desafio Entregable 1 - Andrade Matias
 
 class ProductManager {
     #name
@@ -16,7 +16,7 @@ class ProductManager {
 
         const objectWithCode = this.products.find(element => element.code == code)
         if (objectWithCode) {
-            console.log("ERROR... Este producto ya existe")
+            console.log("ERROR... Este producto con ese código ya existe")
 
         } else {
 
