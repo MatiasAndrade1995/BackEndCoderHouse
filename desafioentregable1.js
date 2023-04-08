@@ -68,12 +68,10 @@ class ProductManager {
 
 let productManager = new ProductManager();
 
-productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123") // Ejecuto metodo addProduct sin todos los campos para probar la validación.
-
-productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123", 0) // Ejecuto metodo addProduct de la clase para agregar producto.
-
-productManager.getProductById(1)
-
-productManager.updateProduct(1, { title: "producto prueba2", stock: 2 })
-
-productManager.getProductById(1)
+productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123") // Ejecuto método addProduct para probar la validación de "All fields are required".
+productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123", 0) // Ejecuto método addProduct de la clase para agregar producto.
+productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123", 0) // Ejecuto método addProduct nuevamente de la clase para probar la validación de `ERROR... The product with this Code: ${code} already exists`.
+productManager.getProductById(1) // Ejecuto método getProductById para buscar producto por ID.
+productManager.updateProduct(1, { title: "producto prueba2", stock: 2 }) // Ejecuto método updateProduct para modificar producto actual existente.
+productManager.getProducts(); // Ejecuto método getProducts para mostrar todos los productos guardados.
+productManager.getProductById(2) // Ejectudo método getProductById con otro ID para validar error de producto no encontrado.
