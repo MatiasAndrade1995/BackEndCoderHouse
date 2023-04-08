@@ -68,6 +68,8 @@ class ProductManager {
 
 let productManager = new ProductManager();
 
+productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123") // Ejecuto metodo addProduct sin todos los campos para probar la validación.
+
 productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin Imagen", "abc123", 0) // Ejecuto metodo addProduct de la clase para agregar producto.
 
 productManager.getProductById(1)
