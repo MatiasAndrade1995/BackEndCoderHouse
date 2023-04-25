@@ -1,0 +1,129 @@
+//Desafio Entregable 3 - Andrade Matias
+
+const fs = require('fs');
+
+class ProductManager {
+
+    #products
+
+    constructor() {
+
+        ProductManager.id = 0
+        this.path = './src/products.json';
+        this.#products = [];
+    }
+
+    getProducts = async () => {
+        try {
+            let res = await fs.promises.readFile(this.path, 'utf-8')
+            console.log(JSON.parse(res));
+            return JSON.parse(res);
+        } catch (res) {
+            console.log(`Error try Read... ${JSON.stringify(this.#products, null, 2)} ------ Array empty`)
+            try {
+                await fs.promises.writeFile(this.path, JSON.stringify(this.#products, null, 2), 'utf-8')
+                console.log("File create")
+            } catch {
+                console.log("Error file create")
+            }
+        }
+    }
+
+    addProduct = async (title, description, price, thumbnail, code, stock,) => {
+        try {
+            let res = await fs.promises.readFile(this.path, 'utf-8')
+            this.#products = (JSON.parse(res));
+        } catch (res) {
+            console.log(`Error try read...`)
+            try {
+                await fs.promises.writeFile(this.path, JSON.stringify(this.#products, null, 2), 'utf-8')
+                console.log("File create")
+            } catch {
+                console.log("Error file create")
+            }
+        }
+        if (title === undefined || description === undefined || price === undefined || thumbnail === undefined || code === undefined || stock === undefined) {
+            console.log("All fields are required")
+            return;
+        }
+        const objectWithCode = this.#products.find(element => element.code == code)
+        if (objectWithCode) {
+            console.log(`ERROR... The product with this Code: ${code} already exists`)
+        } else {
+            // const id = this.#products.length == 0 ? 1 : this.#products[this.#products.length - 1].id + 1
+            const id = ++ProductManager.id
+            this.#products.push({
+                id,
+                title,
+                description,
+                price,
+                thumbnail,
+                code,
+                stock
+            })
+            const writeNewProduct = async () => {
+                try {
+                    await fs.promises.writeFile(this.path, JSON.stringify(this.#products, null, 2), 'utf-8')
+                    console.log("Write successfully")
+                } catch {
+                    console.log("Write error")
+                }
+
+            }
+            await writeNewProduct();
+        }
+
+    }
+
+    updateProduct = async (id, modify) => {
+        const objectWithId = this.#products.find(obj => obj.id == id)
+        if (objectWithId) {
+            let indexProduct = this.#products.findIndex(el => el.id == id)
+            const objectModified = this.#products[indexProduct] = { ...this.#products[indexProduct], ...modify }
+            console.log(objectModified)
+            await fs.promises.writeFile(this.path, JSON.stringify(this.#products, null, 2), 'utf-8')
+            console.log(`Object with ID ${id} has been modify ${JSON.stringify(objectModified)}`)
+        } else {
+            console.log(`The ID ${id} no exists..`)
+        }
+    };
+
+    getProductById = async (id) => {
+        try {
+            let res = await fs.promises.readFile(this.path, 'utf-8')
+            this.#products = (JSON.parse(res));
+            const objectWithId = this.#products.find(obj => obj.id == id)
+            if (objectWithId) {
+                return objectWithId;
+            } else {
+                return null
+            }
+        } catch (res) {
+            return { error: "This file doesn´t exist" }
+        }
+    }
+
+    deleteProduct = async (id) => {
+        const objectWithId = this.#products.find(obj => obj.id == id)
+        if (objectWithId) {
+            let dataFile = [];
+            let data = await fs.promises.readFile(this.path, 'utf-8')
+            if (!data) {
+                console.log('Error try read')
+            } else {
+                dataFile = JSON.parse(data)
+                console.log(dataFile)
+                dataFile = dataFile.filter((obj) => {
+                    return obj.id != id
+                })
+                await fs.promises.writeFile(this.path, JSON.stringify(dataFile), 'utf-8')
+                console.log(`Delete successfully`)
+                console.log(dataFile)
+            }
+        } else {
+            console.log(`The ID ${id} no exists..`)
+        }
+    }
+}
+
+module.exports = ProductManager;
