@@ -1,40 +1,24 @@
-// Desafio Entregable 3 - Andrade Matias
+// Primera Pre Entrega - Andrade Matias
 
 const express = require("express")
+const path = require('path')
 const cors = require("cors")
 const app = express()
 app.use(cors())
+app.use(express.json())
 
-const ProductManager = require("./ProductManager")
+//Routes
+app.use('/api', require('./routes/products'))
+app.use('/api', require('./routes/carts'))
+app.use('/images', require('./routes/multer'))
 
-const productManager = new ProductManager();
+// App para almacenamiento de imagenes 
+app.use(express.static("public"))
 
-app.get("/products", async (req, res) => {
-    let { limit } = req.query
-    const products = await productManager.getProducts()
-    if (limit) {
-        if (limit >= products.length || limit < 0) {
-            res.send(products)
-        } else {
-            res.send(products.slice(0, limit))
-        }
-    } else {
-        res.send(products)
-    }
-})
-
-app.get("/products/:pid", async (req, res) => {
-    const { pid } = req.params
-    const product = await productManager.getProductById(pid)
-    if (product) {
-        res.send(product)
-    } else {
-        res.send({ error: "Not found" })
-    }
-})
+//Accedemos a las imagenes con: http://localhost:8080/ejemplo.jpg
 
 const port = 8080;
 
 app.listen(port, () => {
-    console.log(`El servidor esta escuchando en http://localhost:${port}`)
+    console.log(`Server run on port http://localhost:${port}`)
 })
