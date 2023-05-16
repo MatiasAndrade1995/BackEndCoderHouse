@@ -26,7 +26,6 @@ class ProductManagerInCart {
         } catch (res) {
             console.log(`Not Cart...`)
         }
-
     }
 
     addProductUserCart = async (cid, pid) => {
@@ -37,17 +36,20 @@ class ProductManagerInCart {
             this.productsCart = (JSON.parse(res));
             const userIdCart = this.productsCart.find(obj => obj.id == cid)
             const product = this.#products.find(obj => obj.id == pid)
-            const productExist = userIdCart.cartId.find(obj => obj.id == pid)
-            
-            if (productExist) {
-                productExist.quantity += 1
+            const productExist = userIdCart.cartId.find(obj => obj.productId == pid)
+            if (product) {
+                if (productExist) {
+                    productExist.quantity += 1
+                } else {
+                    const productModify = { productId: product.id, quantity: 1 }
+                    userIdCart.cartId.push(
+                        productModify
+                    )
+                
+                }
             } else {
-                const productModify = { productId: product.id, quantity: 1 }
-                userIdCart.cartId.push(
-                    productModify
-                )
+                return ({ error:"The product does not exist"})
             }
-           
             const writeNewProductUserCart = async () => {
                 try {
                     await fs.promises.writeFile(this.pathCart, JSON.stringify(this.productsCart, null, 2), 'utf-8')
@@ -66,7 +68,33 @@ class ProductManagerInCart {
         }
     }
 
-
+    deleteProductUserCart = async (cid, pid) => {
+        try {
+            let res = await fs.promises.readFile(this.pathCart, 'utf-8')
+            this.productsCart = (JSON.parse(res))
+            const userIdCart = this.productsCart.find(obj => obj.id == cid)
+            const newCart = userIdCart.cartId.filter(obj => obj.productId != pid)
+            if (newCart.length === userIdCart.cartId.length ) {
+                return { error: " Error product not find..." }
+            } else {
+                userIdCart.cartId = newCart
+            }
+            const writeProductsUserFiltered = async () => {
+                try {
+                    await fs.promises.writeFile(this.pathCart, JSON.stringify(this.productsCart, null, 2), 'utf-8')
+                    console.log("Write successfully")
+                } catch {
+                    console.log("Write error")
+                }
+            } 
+            await writeProductsUserFiltered()
+            return userIdCart;
+            
+        } catch (res) {
+            console.log("Error not cart...")
+            return { error: "Error not cart... " }
+        }
+    }
 
     addUserCart = async () => {
         try {
@@ -76,7 +104,6 @@ class ProductManagerInCart {
             this.productsCart = (JSON.parse(res));
             console.log(this.#products)
         } catch (res) {
-            console.log(`Not Cart...`)
             try {
                 await fs.promises.writeFile(this.pathCart, JSON.stringify(this.productsCart, null, 2), 'utf-8')
                 console.log("Cart create")

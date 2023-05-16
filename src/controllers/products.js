@@ -3,6 +3,7 @@ const productManager = new ProductManager();
 
 
 const getProductsController = async (req, res) => {
+    
     let { limit } = req.query
     const products = await productManager.getProducts()
     if (limit) {
@@ -12,9 +13,34 @@ const getProductsController = async (req, res) => {
             res.send(products.slice(0, limit))
         }
     } else {
-        res.send(products)
+        res.render('home', {
+            products : products
+        })
     }
 }
+
+const getProductsControllerRealTime = async (req, res) => {
+    let { limit } = req.query
+    const products = await productManager.getProducts()
+    if (limit) {
+        if (limit >= products.length || limit < 0) {
+            res.render('realtimeproducts', {
+                products: products
+            })
+        } else {
+            res.render('realtimeproducts', {
+                products: products.slice(0, limit)
+            })
+        }
+    } else {
+        res.render('realtimeproducts', {
+            products: products
+        })
+    }
+    return products;
+}
+
+
 
 const getProductController = async (req, res) => {
     const { pid } = req.params
@@ -54,7 +80,13 @@ const deleteProductController = async (req, res) => {
         res.send(returnDeleteProduct)
     } else {
         res.send(returnDeleteProduct)
+         res.render('realtimeproducts', {
+            products: products
+        })
     }
 }
 
-module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController }
+
+
+
+module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime }

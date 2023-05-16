@@ -35,4 +35,16 @@ const createUserControllerCart = async (req, res) => {
     }
 }
 
-module.exports = { getProductsControllerCart, createUserControllerCart, addProductUserControllerCart }
+const deleteProductCart = async(req,res) => {
+    try {
+        const { cid, pid } = req.params
+        const ressDeleteProductCart = await productManagerInCart.deleteProductUserCart(cid, pid)
+        if (ressDeleteProductCart.error) throw ressDeleteProductCart
+        res.send(ressDeleteProductCart)
+    } catch (error) {
+        res.status(404).send(error)
+    }
+}
+
+
+module.exports = { getProductsControllerCart, createUserControllerCart, addProductUserControllerCart, deleteProductCart}

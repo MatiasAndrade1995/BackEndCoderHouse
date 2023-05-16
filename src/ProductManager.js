@@ -1,12 +1,10 @@
 //Primera Pre Entrega - Andrade Matias
-
 const fs = require('fs');
 class ProductManager {
 
     #products
 
     constructor() {
-
         this.path = './src/products.json';
         this.#products = [];
     }
@@ -14,7 +12,6 @@ class ProductManager {
     getProducts = async () => {
         try {
             let res = await fs.promises.readFile(this.path, 'utf-8')
-            console.log(JSON.parse(res));
             return JSON.parse(res);
         } catch (res) {
             console.log(`Error try Read... ${JSON.stringify(this.#products, null, 2)} ------ Array empty`)
@@ -40,7 +37,7 @@ class ProductManager {
                 console.log("Error file create")
             }
         }
-
+        console.log(title, description, price, code, stock, category, thumbnail, status)
         if (title === undefined || description === undefined || price === undefined || code === undefined || stock === undefined || category === undefined || typeof status !== "boolean") {
             if (typeof status !== "boolean") {
                 return { error: "Status is not boolean" };
@@ -63,6 +60,7 @@ class ProductManager {
                 thumbnail,
                 status
             })
+
             const writeNewProduct = async () => {
                 try {
                     await fs.promises.writeFile(this.path, JSON.stringify(this.#products, null, 2), 'utf-8')
@@ -72,6 +70,7 @@ class ProductManager {
                 }
 
             }
+
             await writeNewProduct();
             return {
                 id,
@@ -85,7 +84,6 @@ class ProductManager {
         }
 
     }
-
 
     updateProduct = async (id, modify) => {
         try {
@@ -133,7 +131,6 @@ class ProductManager {
                     console.log('Error try read')
                 } else {
                     dataFile = JSON.parse(data)
-                    console.log(dataFile)
                     dataFile = dataFile.filter((obj) => {
                         return obj.id != id
                     })
@@ -149,6 +146,5 @@ class ProductManager {
 
     }
 }
-
 
 module.exports = ProductManager;
