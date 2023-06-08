@@ -22,7 +22,6 @@ function showAnswer(data) {
     }, 3000)
 }
 
-
 function renderUpdateProducts(data) {
     let htmlProducts = data.map(obj => `<p class="text-center products"> ${obj.title}</p>`).join(' ')
     document.getElementById('products').innerHTML = htmlProducts
@@ -36,14 +35,8 @@ function renderUpdateProductsMenu(data) {
 
 function captureValueId() {
     let select = document.getElementById("options");
-    const product = {
-        id: select.value,
-    }
-
-    console.log(product)
-
+    const product = {id: select.value,}
     socket.emit('productDeleted', product)
-
     return false
 }
 
@@ -69,10 +62,8 @@ function handlesubmit(event) {
         status: valueInputRadio,
         stock: form.inputProductStock.value,
         category: form.inputProductCategory.value,
-        thumbnail: []
+        thumbnail: "file" //form.inputFile.files[0]
     }
-
-    console.log(product)
 
     socket.emit('productAdd', product)
 }

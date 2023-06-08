@@ -1,92 +1,116 @@
-const ProductManager = require("../ProductManager")
+const ProductManager = require("../dao/fs/ProductManager")
 const productManager = new ProductManager();
+const Product = require('../dao/models/products');
+const fs = require('fs')
+const transformData = require('../utils/transformdata')
 
-
-const getProductsController = async (req, res) => {
-    
-    let { limit } = req.query
-    const products = await productManager.getProducts()
-    if (limit) {
-        if (limit >= products.length || limit < 0) {
-            res.send(products)
+//CREATE
+const createProductController = async (req, res) => {
+    const body = req.body;
+    const file = req.file
+    const data = {
+        ...body, thumbnail: `http://localhost:8080/storage/products/${file.filename}`
+    }
+    try {
+        const product = await Product.create(data)
+        res.status(201).send(product)
+    } catch (err) {
+        fs.unlinkSync(`${__dirname}/../../public/storage/products/${file.filename}`);
+        if (err.error) {
+            res.status(404).send(err)
         } else {
-            res.send(products.slice(0, limit))
+            if (err.errors) {
+                res.status(404).send({ error: err.message })
+            } else {
+                res.status(404).send({ error: 'Title or code already be declared in databases' })
+            }
         }
-    } else {
-        res.render('home', {
-            products : products
-        })
+    }
+}
+
+//READ
+const getProductsController = async (req, res) => {
+
+    try {
+        const products = await Product.find()
+        if (products.length > 0) {
+            res.status(200).send(products)
+        } else {
+            res.status(404).send({ error: 'Collection is empty' })
+        }
+    } catch (err) {
+        res.status(404).send({ error: 'Error read collection' })
+    }
+}
+
+//UPDATE
+const updateProductController = async (req, res) => {
+    const { body, file } = req
+    const { pid } = req.params
+    try {
+        const product = await Product.findById(pid)
+        if (product) {
+            const dataReplace = {
+                ...body, thumbnail: file ? `http://localhost:8080/storage/products/${file.filename}` : body.thumbnail
+            }
+            if (file) {
+                const nameFile = product.thumbnail.split("/").pop() // Refiere al último separador que es ${file.filename}
+                fs.unlinkSync(`${__dirname}/../../public/storage/products/${nameFile}`)
+            }
+            const productReplaced = await Product.findByIdAndUpdate(pid, dataReplace, { new: true })
+            res.status(201).send(productReplaced)
+        } else {
+            throw { error: 'Not exist' }
+        }
+    } catch (error) {
+        if (file) { fs.unlinkSync(`${__dirname}/../../public/storage/products/${file.filename}`) }
+        console.log(error)
+        res.status(404).send(error)
+    }
+}
+
+//DELETE
+const deleteProductController = async (req, res) => {
+    const { pid } = req.params
+    try {
+        const product = await Product.findByIdAndDelete(pid)
+        const file = product.thumbnail.split("/").pop()
+        fs.unlinkSync(`${__dirname}/../../public/storage/products/${file}`)
+        if (!product) {
+            throw { error: `The product with ID ${pid} doesnt exist` }
+        }
+        res.status(201).send({ message: 'Delete succefully' })
+    } catch (error) {
+        res.status(404).send(error)
+    }
+}
+
+//READ ONE
+const getProductController = async (req, res) => {
+    const { pid } = req.params
+    try {
+        const product = await Product.findById(pid)
+        if (!product) {
+            throw { error: `The product with ID ${pid} doesnt exist` }
+        }
+        res.status(200).send(product)
+    } catch (error) {
+        res.status(404).send(error)
     }
 }
 
 const getProductsControllerRealTime = async (req, res) => {
-    let { limit } = req.query
-    const products = await productManager.getProducts()
-    if (limit) {
-        if (limit >= products.length || limit < 0) {
-            res.render('realtimeproducts', {
-                products: products
-            })
-        } else {
-            res.render('realtimeproducts', {
-                products: products.slice(0, limit)
-            })
-        }
-    } else {
+    try {
+        const products = await Product.find()
+        const dataProducts = transformData(products)
         res.render('realtimeproducts', {
-            products: products
+            products: dataProducts
         })
-    }
-    return products;
-}
-
-
-
-const getProductController = async (req, res) => {
-    const { pid } = req.params
-    const product = await productManager.getProductById(pid)
-    if (product) {
-        res.send(product)
-    } else {
-        res.status(404)
-        res.send({ error: "Not found" })
-    }
-}
-
-const createProductController = async (req, res) => {
-    const body = req.body;
-    const resaddProduct = await productManager.addProduct(body.title, body.description, body.price, body.code, body.stock, body.category, body.thumbnail, body.status)
-    res.send(resaddProduct)
-}
-
-const updateProductController = async (req, res) => {
-    const { pid } = req.params
-    const returnGetProductById = await productManager.getProductById(pid)
-    const body = req.body
-    if (returnGetProductById) {
-        const resUpdateProduct = await productManager.updateProduct(pid, body)
-        res.send(resUpdateProduct);
-    } else {
-        res.status(404)
-        res.send(returnGetProductById)
-    }
-}
-
-const deleteProductController = async (req, res) => {
-    const { pid } = req.params
-    const returnDeleteProduct = await productManager.deleteProduct(pid)
-    if (returnDeleteProduct.error) {
-        res.status(404)
-        res.send(returnDeleteProduct)
-    } else {
-        res.send(returnDeleteProduct)
-         res.render('realtimeproducts', {
-            products: products
+    } catch (error) {
+        res.render('realtimeproducts', {
+            error: 'Error'
         })
     }
 }
-
-
-
 
 module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime }

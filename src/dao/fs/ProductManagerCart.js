@@ -7,8 +7,8 @@ class ProductManagerInCart {
 
     constructor() {
 
-        this.path = './src/products.json';
-        this.pathCart = './src/cart.json';
+        this.path = './src/dao/fs/products.json';
+        this.pathCart = './src/dao/fs/cart.json';
         this.productsCart = [];
         this.#products = [];
     }

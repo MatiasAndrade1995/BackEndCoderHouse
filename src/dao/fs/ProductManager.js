@@ -5,7 +5,7 @@ class ProductManager {
     #products
 
     constructor() {
-        this.path = './src/products.json';
+        this.path = './src/dao/fs/products.json';
         this.#products = [];
     }
 
@@ -134,7 +134,7 @@ class ProductManager {
                     dataFile = dataFile.filter((obj) => {
                         return obj.id != id
                     })
-                    await fs.promises.writeFile(this.path, JSON.stringify(dataFile), 'utf-8')
+                    await fs.promises.writeFile(this.path, JSON.stringify(dataFile, null, 2), 'utf-8')
                     return dataFile
                 }
             } else {
