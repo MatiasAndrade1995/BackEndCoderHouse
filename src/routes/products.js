@@ -3,12 +3,11 @@ const router = express.Router()
 const uploadMulter = require('../utils/multer')
 
 
-const { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime } = require ('../controllers/products')
-
+const { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime, getProductsControllerView } = require ('../controllers/products')
 
 router.get('/', getProductsController)
+router.get("/products", getProductsControllerView)
 router.get('/realtimeproducts', getProductsControllerRealTime)
-router.get("/products", getProductsController)
 router.get("/products/:pid", getProductController)
 router.post("/products", uploadMulter.single('thumbnail'),createProductController)
 router.put("/products/:pid", uploadMulter.single('thumbnail'), updateProductController)

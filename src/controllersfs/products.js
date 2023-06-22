@@ -3,7 +3,7 @@ const productManager = new ProductManager();
 
 
 const getProductsController = async (req, res) => {
-
+    
     let { limit } = req.query
     const products = await productManager.getProducts()
     if (limit) {

@@ -68,3 +68,34 @@ function handlesubmit(event) {
     socket.emit('productAdd', product)
 }
 
+function creatCart() {
+    socket.emit('requestnewcart', 'User request a new cart...')
+}
+
+function loadCart() {
+    event.preventDefault()
+    const cartID = document.querySelector('input[name="cartID"]').value;
+    socket.emit('requestloadcart', cartID)
+}
+
+
+
+let newCart
+
+socket.on('requestcartok', (data) => {
+    console.log(`Cart ID ${data._id} loaded...`)
+    newCart = data._id
+})
+
+function captureValueIdProduct(id) {
+    console.log(`Trying add product in Cart : ${newCart}`)
+    const requestProduct = {
+        pid: id,
+        cid : newCart
+    }
+    socket.emit('requestproduct',(requestProduct))
+}
+
+socket.on('cartupdated', (data) => {
+    console.log('Cart updated...'+ JSON.stringify(data))
+})

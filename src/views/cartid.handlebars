@@ -1,0 +1,9 @@
+<div class="container p-2">
+    <h1 class="text-center">My Cart</h1>
+    <div class="text-center">
+        {{#each productsCart}}
+        <h3>{{this.title}}</h3>
+        <h3>Quantity: {{this.quantity}}</h3>
+        {{/each}}
+    </div>
+</div>

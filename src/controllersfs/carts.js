@@ -1,6 +1,5 @@
 const ProductManagerInCart = require("../dao/fs/ProductManagerCart")
 const productManagerInCart = new ProductManagerInCart();
-
 const getProductsControllerCart = async (req, res) => {
     try {
         const { cid } = req.params
@@ -45,6 +44,5 @@ const deleteProductCart = async(req,res) => {
         res.status(404).send(error)
     }
 }
-
 
 module.exports = { getProductsControllerCart, createUserControllerCart, addProductUserControllerCart, deleteProductCart}

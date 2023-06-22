@@ -2,7 +2,8 @@ const ProductManager = require("../dao/fs/ProductManager")
 const productManager = new ProductManager();
 const Product = require('../dao/models/products');
 const fs = require('fs')
-const transformData = require('../utils/transformdata')
+const { transformDataProducts} = require('../utils/transformdata');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 //CREATE
 const createProductController = async (req, res) => {
@@ -30,18 +31,59 @@ const createProductController = async (req, res) => {
 
 //READ
 const getProductsController = async (req, res) => {
-
+    const { category, status, limit, sort, page } = req.query;
+    const limitQueryParams = limit || 10;
+    const order = sort;
+    status == "true" ? true : false;
+    let products;
     try {
-        const products = await Product.find()
-        if (products.length > 0) {
-            res.status(200).send(products)
+        if (category || status) {
+            products = await Product.paginate({ $or: [{ category: category }, { status: status }] }, {
+                limit: limitQueryParams,
+                sort: { price: order },
+                page: page || 1 
+            });
         } else {
-            res.status(404).send({ error: 'Collection is empty' })
+            products = await Product.paginate({}, {
+                limit: limitQueryParams,
+                sort: { price: order },
+                page: page || 1
+            });
         }
+        res.status(200).send(products)
     } catch (err) {
-        res.status(404).send({ error: 'Error read collection' })
+        res.status(500).send({ error: 'Error reading filter' });
     }
-}
+};
+
+const getProductsControllerView = async (req, res) => {
+    const { category, status, limit, sort, page } = req.query;
+    const limitQueryParams = limit || 10;
+    const order = sort;
+    status == "true" ? true : false;
+    let products;
+    try {
+        if (category || status) {
+            products = await Product.paginate({ $or: [{ category: category }, { status: status }] }, {
+                limit: limitQueryParams,
+                sort: { price: order },
+                page: page || 1
+            });
+        } else {
+            products = await Product.paginate({}, {
+                limit: limitQueryParams,
+                sort: { price: order },
+                page: page || 1
+            });
+        }
+        const dataProducts = transformDataProducts(products.docs)
+        res.status(200).render('viewproducts', {
+            products: dataProducts
+        })
+    } catch (err) {
+        res.status(500).send({ error: 'Error reading products indicate' });
+    }
+};
 
 //UPDATE
 const updateProductController = async (req, res) => {
@@ -102,7 +144,7 @@ const getProductController = async (req, res) => {
 const getProductsControllerRealTime = async (req, res) => {
     try {
         const products = await Product.find()
-        const dataProducts = transformData(products)
+        const dataProducts = transformDataProducts(products)
         res.render('realtimeproducts', {
             products: dataProducts
         })
@@ -113,4 +155,4 @@ const getProductsControllerRealTime = async (req, res) => {
     }
 }
 
-module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime }
+module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime, getProductsControllerView}

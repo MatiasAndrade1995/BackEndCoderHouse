@@ -33,7 +33,6 @@ const createMessage = async (req, res) => {
     }
 }
 
-
 const getMessagesRealtimeController = async (req, res) => {
     try {
         const messages = await Message.find()
@@ -49,7 +48,4 @@ const getMessagesRealtimeController = async (req, res) => {
     }
 }
 
-
-
-
-module.exports = { getMessages, createMessage, getMessagesRealtimeController }
+module.exports = {getMessages, createMessage, getMessagesRealtimeController}

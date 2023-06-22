@@ -1,0 +1,29 @@
+<div class="container">
+    <h1 class="text-center mt-5">Products</h1>
+    <div class="row d-flex justify-content-center">
+        <div class="col-3">
+            <div id="products">
+                {{#each products}}
+                <div class="text-center">
+                    <h2 class="products mt-2">
+                        {{this.title}}
+                    </h2>
+                    <h3>Price: ${{this.price}}</h3>
+                    <input type="submit" class="btn btn-primary" value="Buy"
+                        onclick="captureValueIdProduct('{{this.id}}')"></input>
+                </div>
+                {{/each}}
+            </div>
+            <div>
+                <button onclick="creatCart()" class="createCart">Create Cart</button>
+                <form onsubmit="loadCart()">
+                    <input name="cartID" onclick="loadCart()" class="createCart col-12 w-75" placeholder="Load your cart ID">
+                    <input type="submit" class="btn btn-primary col-12 createCart w-50 d-flex justify-content-center " value="Load">
+                </form>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>

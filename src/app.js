@@ -21,10 +21,10 @@ app.use('/api', require('./routes/messages'))
 //Import models
 const Product = require('./dao/models/products');
 const Message = require('./dao/models/messages')
+const Cart = require('./dao/models/cart')
 
 //Import transformDataProducts
 const { transformDataProducts, transformDataChat } = require('./utils/transformdata')
-
 
 
 //Socket Import
@@ -54,10 +54,10 @@ io.on('connection', (socket) => {
     socket.emit('Welcome', 'Hello, welcome new user')
     socket.on('SendMessage', async (data) => {
         try {
-                const prueba = await Message.create(data)
-                let messages = await Message.find()
-                const dataMessages = transformDataChat(messages)
-                socket.emit('refreshmessages', dataMessages)    
+            const prueba = await Message.create(data)
+            let messages = await Message.find()
+            const dataMessages = transformDataChat(messages)
+            socket.emit('refreshmessages', dataMessages)
         } catch (err) {
             console.log(err)
         }
@@ -83,6 +83,65 @@ io.on('connection', (socket) => {
             console.log(err)
         }
 
+    })
+    socket.on('requestnewcart', async (data) => {
+        try {
+            res = await Cart.create({})
+            socket.emit('requestcartok', res)
+        } catch {
+            console.log(err)
+        }
+    })
+    socket.on('requestproduct', async (data) => {
+        try {
+            const product = await Product.findById(data.pid);
+            const cart = await Cart.findById(data.cid);
+            const quantity = 1
+            const stock = product.stock;
+            const existingQuantity = cart.products.find(entry => entry.product.toString() === data.pid)?.quantity || 0;
+            const totalQuantity = existingQuantity + quantity;
+            if (cart.products.some(entry => entry.product.toString() === data.pid)) {
+                if (product && cart) {
+                    if (totalQuantity < stock) {
+                        const productInCartIndex = cart.products.findIndex(entry => entry.product.toString() === data.pid);
+                        cart.products[productInCartIndex].quantity = totalQuantity;
+                        product.stock -= quantity;
+                        await product.save();
+                        await cart.save();
+                    } else {
+                        console.log('Quantity exceeds available');
+                    }
+                } else {
+                    console.log('Error try found cart or product');
+                }
+            } else {
+                if (product && cart) {
+                    if (quantity <= stock) {
+                        cart.products.push({ product: product._id, quantity: 1 });
+                        product.stock -= quantity;
+                        await product.save();
+                        await cart.save();
+                    } else {
+                        console.log('Quantity exceeds available')
+                    }
+                } else {
+                    console.log('Error try found cart or product');
+                }
+            }
+            const cartUpdated = await Cart.findById(data.cid).populate('products.product');
+            socket.emit('cartupdated', cartUpdated)
+        } catch {
+            console.log('error')
+        }
+    })
+    socket.on('requestloadcart', async (data) => {
+        try {
+            res = await Cart.findById(data)
+            console.log(`my id ${res}`)
+            socket.emit('requestcartok', res)
+        } catch {
+            console.log('error')
+        }
     })
 })
 
