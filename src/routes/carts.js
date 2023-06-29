@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const {productsInCartController, creatCartController, getCartsController,deleteProductsCartController, deleteProductSelectedCartController, getProductsInCartIdController } = require('../controllers/carts')
+const { productsInCartController, creatCartController, getCartsController, deleteProductsCartController, deleteProductSelectedCartController, getProductsInCartIdController} = require('../controllers/carts')
 
 router.get("/carts", getCartsController)
 router.get("/carts/:cid", getProductsInCartIdController)

@@ -38,27 +38,30 @@ const getProductsInCartIdController = async (req, res) => {
         const productsInCart = await Cart.findById(cid).populate('products.product');
         const { products } = productsInCart
         const dataCartId = transformDataCart(products)
+        console.log(dataCartId)
         res.status(200).render('cartid', {
             productsCart: dataCartId
-        })
+        });
     } catch (error) {
         res.status(404).send({ error: 'Error try found Users cart' })
     }
 }
 
+
 const productsInCartController = async (req, res) => {
     const { cid, pid } = req.params;
     const { quantity } = req.body;
+    console.log(req.body)
     try {
         const product = await Product.findById(pid);
         const cart = await Cart.findById(cid);
         const stock = product.stock;
-        if (cart.products.some(entry => entry.product.toString() === pid)) {
-            if (product && cart) {
+        const productInCartIndex = cart.products.findIndex(entry => entry.product.toString() === pid);
+        if (productInCartIndex != -1) {
+            if (product) {
                 const existingQuantity = cart.products.find(entry => entry.product.toString() === pid)?.quantity || 0;
                 const totalQuantity = existingQuantity + quantity;
                 if (totalQuantity < stock) {
-                    const productInCartIndex = cart.products.findIndex(entry => entry.product.toString() === pid);
                     cart.products[productInCartIndex].quantity = totalQuantity;
                     product.stock -= quantity;
                     await product.save();
@@ -72,7 +75,7 @@ const productsInCartController = async (req, res) => {
                 res.status(404).send({ error: 'Error try found cart or product' });
             }
         } else {
-            if (product && cart) {
+            if (product) {
                 if (quantity <= stock) {
                     cart.products.push({ product: product._id, quantity: 1 });
                     product.stock -= quantity;

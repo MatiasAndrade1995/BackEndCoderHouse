@@ -10,7 +10,6 @@ const getProductsControllerCart = async (req, res) => {
         res.status(404).send(error)
     }
 }
-
 const addProductUserControllerCart = async (req, res) => {
     try {
         const { cid, pid } = req.params

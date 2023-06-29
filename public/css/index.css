@@ -1,6 +1,8 @@
 .products {
+    height: 65px;
     color: rgb(31, 103, 185);
     text-decoration: underline;
+    margin: 5px auto;
 }
 
 h1 {
@@ -44,6 +46,7 @@ h4 {
     background-color: rgba(144, 136, 189, 0.39);
     width: 50%;
     padding-bottom: 5px;
+    margin: 0 auto;
 }
 
 .msjChatView {
@@ -58,3 +61,27 @@ h4 {
     margin: 20px auto;
     justify-content: center;
 }
+
+li{
+    list-style: none;
+}
+
+.productsbox{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+    gap: 40px;
+}
+
+.formRegis{
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    margin: 0px auto;
+    gap: 5px
+}
+
+.botonChooseProducts{
+    width: 100%;
+    margin: 0px auto;
+}
+

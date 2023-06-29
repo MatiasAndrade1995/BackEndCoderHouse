@@ -2,8 +2,9 @@ const ProductManager = require("../dao/fs/ProductManager")
 const productManager = new ProductManager();
 const Product = require('../dao/models/products');
 const fs = require('fs')
-const { transformDataProducts} = require('../utils/transformdata');
+const { transformDataProducts } = require('../utils/transformdata');
 const mongoosePaginate = require('mongoose-paginate-v2');
+
 
 //CREATE
 const createProductController = async (req, res) => {
@@ -41,7 +42,7 @@ const getProductsController = async (req, res) => {
             products = await Product.paginate({ $or: [{ category: category }, { status: status }] }, {
                 limit: limitQueryParams,
                 sort: { price: order },
-                page: page || 1 
+                page: page || 1
             });
         } else {
             products = await Product.paginate({}, {
@@ -57,7 +58,7 @@ const getProductsController = async (req, res) => {
 };
 
 const getProductsControllerView = async (req, res) => {
-    const { category, status, limit, sort, page } = req.query;
+    const { category, status, limit, sort, page} = req.query;
     const limitQueryParams = limit || 10;
     const order = sort;
     status == "true" ? true : false;
@@ -77,9 +78,16 @@ const getProductsControllerView = async (req, res) => {
             });
         }
         const dataProducts = transformDataProducts(products.docs)
-        res.status(200).render('viewproducts', {
-            products: dataProducts
-        })
+
+            res.status(200).render('viewproducts', {
+                products: dataProducts,
+                email: req.session.email,
+                firstname: req.session.first_name,
+                lastname: req.session.last_name,
+                rol: req.session.rol,
+                cart:'hola'
+            })
+
     } catch (err) {
         res.status(500).send({ error: 'Error reading products indicate' });
     }
@@ -155,4 +163,4 @@ const getProductsControllerRealTime = async (req, res) => {
     }
 }
 
-module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime, getProductsControllerView}
+module.exports = { getProductsController, getProductController, createProductController, updateProductController, deleteProductController, getProductsControllerRealTime, getProductsControllerView }

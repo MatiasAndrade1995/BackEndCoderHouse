@@ -59,10 +59,6 @@ const createProductController = async (req, res) => {
     res.send(resaddProduct)
 }
 
-
-
-
-
 const updateProductController = async (req, res) => {
     const { pid } = req.params
     const returnGetProductById = await productManager.getProductById(pid)
